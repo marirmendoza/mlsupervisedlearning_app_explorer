@@ -68,29 +68,36 @@ with tab1:
         elif error < 15:
             st.info("You are getting close! Try adjusting the slope a bit more.")
 
+        st.markdown("---")
+        st.subheader("Predict for a New Point")
+        new_x = st.slider("Select a day to predict:", 0.0, 15.0, 12.0)
+        new_y = slope * new_x + intercept
+        st.write(f"Based on your line, a plant at day **{new_x}** will be **{new_y:.2f} cm** tall.")
+
     with col_reg_right:
         fig_reg = go.Figure()
         # Data points
         fig_reg.add_trace(go.Scatter(x=x_reg, y=y_reg, mode='markers', name='Actual Data', marker=dict(size=10, color='blue')))
         # User line
-        x_line = np.array([0, 10])
+        x_line = np.array([0, 15])
         y_line = slope * x_line + intercept
         fig_reg.add_trace(go.Scatter(x=x_line, y=y_line, mode='lines', name='Your Model', line=dict(color='red', width=3)))
+        
+        # New prediction point (unlabeled)
+        fig_reg.add_trace(go.Scatter(x=[new_x], y=[new_y], mode='markers', name='New Prediction', 
+                                    marker=dict(size=15, color='gray', symbol='x', line=dict(width=2, color='black'))))
         
         fig_reg.update_layout(
             title="House Growth vs. Time (Analogy)",
             xaxis_title="Time (Days)",
             yaxis_title="Height (cm)",
             template="plotly_white",
-            height=500
+            height=500,
+            xaxis=dict(range=[0, 15]),
+            yaxis=dict(range=[0, 45])
         )
         st.plotly_chart(fig_reg, use_container_width=True)
 
-    st.markdown("---")
-    st.subheader("Predict for a New Point")
-    new_x = st.number_input("Enter a new prediction day:", 0.0, 15.0, 12.0)
-    new_y = slope * new_x + intercept
-    st.write(f"Based on your line, a plant at day **{new_x}** will be **{new_y:.2f} cm** tall.")
 
 # ============================================================
 # TAB 2: CLASSIFICATION
@@ -103,21 +110,29 @@ with tab2:
     Imagine you are a machine trying to separate apples from oranges based on their weight and color intensity.
     """)
     
+    # Select scenario
+    scenario = st.radio("Choose the Scenario:", ["Linearly Separable", "Non-Linearly Separable (Circular)"])
+    
     # Generate some synthetic data for classification
     np.random.seed(42)
-    X_cls = np.random.rand(20, 2) * 10
-    y_cls = (X_cls[:, 0] + X_cls[:, 1] > 10).astype(int)
+    X_cls = np.random.rand(30, 2) * 10
     
+    if scenario == "Linearly Separable":
+        y_cls = (X_cls[:, 0] + X_cls[:, 1] > 10).astype(int)
+        st.info("This problem can be perfectly solved with a straight line (a linear model).")
+    else:
+        # Circular pattern: points inside distance R from center are class 1
+        center = np.array([5, 5])
+        dist = np.linalg.norm(X_cls - center, axis=1)
+        y_cls = (dist < 3.5).astype(int)
+        st.warning("⚠️ This problem is **NOT** linearly separable. No matter how you move the straight line, you will always misclassify some points.")
+
     col_cls_left, col_cls_right = st.columns([1, 2])
     
     with col_cls_left:
         st.subheader("Adjust the Divider")
-        angle = st.slider("Rotation Angle", -1.5, 1.5, 0.0, 0.1)
+        angle = st.slider("Rotation Angle", -2.5, 2.5, 0.0, 0.1)
         offset = st.slider("Position Offset", -15.0, 15.0, 5.0, 0.5)
-        
-        # Divider line: x2 = m*x1 + b -> m*x1 - x2 + b = 0
-        # For simplicity, let's use a rotation + offset logic
-        # Points are correctly classified if (angle * x1 - x2 + offset) has the same sign as the real label logic
         
         def user_predict(X):
             return (angle * X[:, 0] - X[:, 1] + offset > 0).astype(int)
@@ -133,6 +148,14 @@ with tab2:
         elif correct > total * 0.8:
             st.info("Almost there! A few points are still on the wrong side.")
 
+        st.markdown("---")
+        st.subheader("Predict for a New Item")
+        c_x1 = st.slider("New Item Feature 1:", 0.0, 10.0, 2.0)
+        c_x2 = st.slider("New Item Feature 2:", 0.0, 10.0, 2.0)
+        new_point_cls = user_predict(np.array([[c_x1, c_x2]]))[0]
+        label = "Blue Class" if new_point_cls == 1 else "Red Class"
+        st.write(f"This new item would be classified as: **{label}**")
+
     with col_cls_right:
         fig_cls = go.Figure()
         # Data points
@@ -146,6 +169,10 @@ with tab2:
         y_sep = angle * x_sep + offset
         fig_cls.add_trace(go.Scatter(x=x_sep, y=y_sep, mode='lines', name='Decision Boundary', line=dict(color='black', width=4, dash='dash')))
         
+        # New prediction point (unlabeled)
+        fig_cls.add_trace(go.Scatter(x=[c_x1], y=[c_x2], mode='markers', name='New Item', 
+                                    marker=dict(size=16, color='gray', symbol='star', line=dict(width=2, color='black'))))
+        
         fig_cls.update_layout(
             title="Separating Categories (Apples vs Oranges)",
             xaxis_title="Feature 1 (e.g. Weight)",
@@ -157,13 +184,6 @@ with tab2:
         )
         st.plotly_chart(fig_cls, use_container_width=True)
 
-    st.markdown("---")
-    st.subheader("Predict for a New Item")
-    c_x1 = st.slider("New Item Feature 1:", 0.0, 10.0, 2.0)
-    c_x2 = st.slider("New Item Feature 2:", 0.0, 10.0, 2.0)
-    new_point_cls = user_predict(np.array([[c_x1, c_x2]]))[0]
-    label = "Blue Class" if new_point_cls == 1 else "Red Class"
-    st.write(f"This new item would be classified as: **{label}**")
 
 # ============================================================
 # TAB 3: OVERFITTING
@@ -206,10 +226,11 @@ with tab3:
         if show_test:
             st.metric("Generalization Error (Hidden)", f"{test_error:.4f}")
             
-        if degree > 8:
-            st.warning("Notice how the curve wiggles to hit every single point? That's overfitting!")
-        elif degree < 3:
-            st.info("The line is too simple to see the wave. This is underfitting.")
+            if degree > 8:
+                st.warning("Notice how the curve wiggles to hit every single point? That's overfitting!")
+            elif degree < 3:
+                st.info("The line is too simple to see the wave. This is underfitting.")
+
 
     with col3_right:
         fig_over = go.Figure()
