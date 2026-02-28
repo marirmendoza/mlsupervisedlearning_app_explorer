@@ -33,7 +33,7 @@ Explore the three scenarios below to understand the two main tasks: **Regression
 # TABS FOR SCENARIOS
 # ============================================================
 
-tab1, tab2, tab3 = st.tabs(["Regression: The Line Hunter", "Classification: The Great Divider", "Scenario 3: The Overfitter"])
+tab1, tab2, tab3 = st.tabs(["Regression: The Line Hunter", "Classification: The Best Divider", "Going Beyond: The Overfitter"])
 
 # ============================================================
 # TAB 1: REGRESSION
@@ -176,7 +176,7 @@ with tab2:
         fig_cls.update_layout(
             title="Separating Categories (Apples vs Oranges)",
             xaxis_title="Feature 1 (e.g. Weight)",
-            yaxis_title="Feature 2 (e.g. Texture)",
+            yaxis_title="Feature 2 (e.g. Color Intensity)",
             template="plotly_white",
             height=500,
             xaxis=dict(range=[0, 10]),
