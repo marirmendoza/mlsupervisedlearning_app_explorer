@@ -9,7 +9,7 @@ This app breaks down the two primary types of supervised tasks: **Regression** (
 This app was developed by **Prof. Mariana Recamonde Mendoza** as supporting material for the **Machine Learning** course taught at the **Institute of Informatics — Federal University of Rio Grande do Sul (UFRGS)**.
 
 🔗 [https://inf-supervisedml-app-explorer.streamlit.app](https://inf-supervisedml-app-explorer.streamlit.app)
-inf-mlsupervised-app-explorer
+
 ---
 
 ## App Goal
