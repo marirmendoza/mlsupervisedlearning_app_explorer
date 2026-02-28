@@ -2,9 +2,7 @@
 
 This interactive application, built with **Streamlit** and **Python**, allows you to explore the fundamentals of **Supervised Learning** in a visual and intuitive way.
 
-Supervised Learning is the branch of Machine Learning (ML) where models learn from labeled examples, that is, each example has input features and it is paired with a correct expected answer.  By observing these patterns and fitting the model, the goal is to become capable of predicting answers for new, unseen cases. The goal is simple:
-
-> Learn a pattern from known examples and use it to make predictions on new, unseen data.
+Supervised Learning is the branch of Machine Learning (ML) where models learn from labeled examples, that is, each example has input features and it is paired with a correct expected answer.  The goal is simple: learn a pattern from known examples and use it to make predictions on new, unseen data.
 
 This app breaks down the two primary types of supervised tasks: **Regression** (predicting numbers) and **Classification** (predicting categories). It also introduces the critical concept of **Overfitting** in ML, where a model becomes "too smart for its own good" by memorizing noise instead of learning the general signal.
 
