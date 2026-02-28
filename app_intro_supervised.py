@@ -88,7 +88,7 @@ with tab1:
                                     marker=dict(size=15, color='gray', symbol='x', line=dict(width=2, color='black'))))
         
         fig_reg.update_layout(
-            title="House Growth vs. Time (Analogy)",
+            title="Plant Growth vs. Time (Analogy)",
             xaxis_title="Time (Days)",
             yaxis_title="Height (cm)",
             template="plotly_white",
@@ -107,7 +107,7 @@ with tab2:
     st.header("Classification: Sorting into Categories")
     st.write("""
     In **Classification**, the goal is to predict a discrete category or 'label'. 
-    Imagine you are a machine trying to separate apples from oranges based on their weight and color intensity.
+    Imagine you are a machine trying to separate apples (red points) from oranges (blue points) based on their weight and color intensity.
     """)
     
     # Select scenario
