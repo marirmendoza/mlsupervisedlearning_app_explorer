@@ -33,7 +33,7 @@ Explore the three scenarios below to understand the two main tasks: **Regression
 # TABS FOR SCENARIOS
 # ============================================================
 
-tab1, tab2, tab3 = st.tabs(["Regression: The Line Hunter", "Classification: The Best Divider", "Going Beyond: The Overfitter"])
+tab1, tab2, tab3 = st.tabs(["Regression: The Line Hunter", "Classification: The Great Divider", "Scenario 3: The Overfitter"])
 
 # ============================================================
 # TAB 1: REGRESSION
@@ -88,7 +88,7 @@ with tab1:
                                     marker=dict(size=15, color='gray', symbol='x', line=dict(width=2, color='black'))))
         
         fig_reg.update_layout(
-            title="Plant Growth vs. Time (Analogy)",
+            title="House Growth vs. Time (Analogy)",
             xaxis_title="Time (Days)",
             yaxis_title="Height (cm)",
             template="plotly_white",
@@ -107,7 +107,7 @@ with tab2:
     st.header("Classification: Sorting into Categories")
     st.write("""
     In **Classification**, the goal is to predict a discrete category or 'label'. 
-    Imagine you are a machine trying to separate apples (red points) from oranges (blue points) based on their weight and color intensity.
+    Imagine you are a machine trying to separate apples from oranges based on their weight and color intensity.
     """)
     
     # Select scenario
@@ -134,10 +134,20 @@ with tab2:
         angle = st.slider("Rotation Angle", -2.5, 2.5, 0.0, 0.1)
         offset = st.slider("Position Offset", -15.0, 15.0, 5.0, 0.5)
         
-        def user_predict(X):
-            return (angle * X[:, 0] - X[:, 1] + offset > 0).astype(int)
+        def user_predict(X, flip=False):
+            score = angle * X[:, 0] - X[:, 1] + offset
+            return (score > 0).astype(int) if not flip else (score <= 0).astype(int)
         
-        preds = user_predict(X_cls)
+        # Test which polarity is better to help the user (auto-labeling the sides)
+        preds_normal = user_predict(X_cls, flip=False)
+        preds_flipped = user_predict(X_cls, flip=True)
+        
+        acc_normal = np.sum(preds_normal == y_cls)
+        acc_flipped = np.sum(preds_flipped == y_cls)
+        
+        # We assume the side with more matches defines what "positive" means for the user
+        use_flip = acc_flipped > acc_normal
+        preds = preds_flipped if use_flip else preds_normal
         correct = np.sum(preds == y_cls)
         total = len(y_cls)
         
@@ -152,7 +162,7 @@ with tab2:
         st.subheader("Predict for a New Item")
         c_x1 = st.slider("New Item Feature 1:", 0.0, 10.0, 2.0)
         c_x2 = st.slider("New Item Feature 2:", 0.0, 10.0, 2.0)
-        new_point_cls = user_predict(np.array([[c_x1, c_x2]]))[0]
+        new_point_cls = user_predict(np.array([[c_x1, c_x2]]), flip=use_flip)[0]
         label = "Blue Class" if new_point_cls == 1 else "Red Class"
         st.write(f"This new item would be classified as: **{label}**")
 
@@ -176,7 +186,7 @@ with tab2:
         fig_cls.update_layout(
             title="Separating Categories (Apples vs Oranges)",
             xaxis_title="Feature 1 (e.g. Weight)",
-            yaxis_title="Feature 2 (e.g. Color Intensity)",
+            yaxis_title="Feature 2 (e.g. Texture)",
             template="plotly_white",
             height=500,
             xaxis=dict(range=[0, 10]),
